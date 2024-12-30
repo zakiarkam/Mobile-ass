@@ -15,17 +15,15 @@ export default function ListItem({
       <View style={styles.itemInfo}>
         <Image source={photo} style={styles.image} />
         <View style={styles.textContainer}>
-          <Text style={styles.subTitle}>{subTitle}</Text>
           <Text numberOfLines={1} style={styles.title}>
             {title}
           </Text>
+          <Text style={styles.subTitle}>{subTitle}</Text>
         </View>
       </View>
 
       <TouchableOpacity onPress={onPress} style={styles.button}>
-        <Text style={styles.buttonText}>
-          {isFree === "Yes" ? "Play" : price}
-        </Text>
+        <Text style={styles.buttonText}>Read</Text>
       </TouchableOpacity>
     </View>
   );
@@ -55,16 +53,16 @@ const styles = StyleSheet.create({
   subTitle: {
     color: "#333",
     fontFamily: "Roboto-Medium",
-    fontSize: 14,
+    fontSize: 12,
   },
   title: {
     color: "#333",
     fontFamily: "Roboto-Medium",
-    fontSize: 14,
-    textTransform: "uppercase",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   button: {
-    backgroundColor: "#0aada8",
+    backgroundColor: "#ADD8E6", // light blue color code
     padding: 10,
     width: 100,
     borderRadius: 10,

@@ -22,14 +22,14 @@ const RegisterScreen = ({ navigation }) => {
   const { register } = useContext(AuthContext);
 
   const handleRegister = () => {
-    if (!email || !password || !confirmPassword) {
-      Alert.alert("Error", "All fields are required.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match.");
-      return;
-    }
+    // if (!email || !password || !confirmPassword) {
+    //   Alert.alert("Error", "All fields are required.");
+    //   return;
+    // }
+    // if (password !== confirmPassword) {
+    //   Alert.alert("Error", "Passwords do not match.");
+    //   return;
+    // }
     register(email, password)
       .then(() => {
         Alert.alert("Success", "Account created successfully!");

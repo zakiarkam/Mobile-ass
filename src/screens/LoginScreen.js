@@ -11,7 +11,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import CustomButton from "../components/CustomButton";
 import InputField from "../components/InputField";
-import { AuthContext } from "../navigation/AuthProvider";
+import { AuthContext } from "../../src/navigation/AuthProvider";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -19,14 +19,17 @@ const LoginScreen = ({ navigation }) => {
   const { login } = useContext(AuthContext);
 
   const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please enter both email and password.");
-      return;
-    }
+    // if (!email || !password) {
+    //   Alert.alert("Error", "Please enter both email and password.");
+    //   return;
+    // }
 
     login(email, password)
       .then(() => {
         Alert.alert("Success", "You are logged in!");
+      })
+      .then(() => {
+        navigation.navigate("Register");
       })
       .catch((error) => {
         Alert.alert("Error", error.message);

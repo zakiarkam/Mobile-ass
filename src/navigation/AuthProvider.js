@@ -1,38 +1,36 @@
-import React, { createContext, useState } from "react";
-import auth from "@react-native-firebase/auth";
-import { onAuthStateChanged } from "firebase/auth";
-import { FIREBASE_AUTH } from "../FirebaseConfig";
+import React, { createContext, useState, useEffect } from "react";
+import { FIREBASE_AUTH } from "../../FirebaseConfig";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
 
 export const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (currentUser) => {
+      setUser(currentUser);
+    });
+    return unsubscribe; // Cleanup listener
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
         user,
-        setUser,
         login: async (email, password) => {
-          try {
-            await auth().signInWithEmailAndPassword(email, password);
-          } catch (e) {
-            console.log(e);
-          }
+          return signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
         },
         register: async (email, password) => {
-          try {
-            await auth().createUserWithEmailAndPassword(email, password);
-          } catch (e) {
-            console.log(e);
-          }
+          return createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
         },
         logout: async () => {
-          try {
-            await auth().signOut();
-          } catch (e) {
-            console.error(e);
-          }
+          return signOut(FIREBASE_AUTH);
         },
       }}
     >

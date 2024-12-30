@@ -1,40 +1,104 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   SafeAreaView,
-  ScrollView,
+  FlatList,
   ImageBackground,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
-// import Carousel from "react-native-snap-carousel";
 import Feather from "react-native-vector-icons/Feather";
 
-import BannerSlider from "../components/BannerSlider";
-import { windowWidth } from "../utils/Dimensions";
-
-import { ongoinglessons, pastlessons, sliderData } from "../model/data";
 import CustomSwitch from "../components/CustomSwitch";
 import ListItem from "../components/ListItem";
 
 export default function HomeScreen({ navigation }) {
-  const [gamesTab, setGamesTab] = useState(1);
+  const [booksTab, setBooksTab] = useState(1);
+  const [ongoingLessons, setOngoingLessons] = useState([]);
+  const [pastLessons, setPastLessons] = useState([]);
+  const [filteredLessons, setFilteredLessons] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const renderBanner = ({ item }) => {
-    return <BannerSlider data={item} />;
-  };
+  useEffect(() => {
+    fetch("https://wolnelektury.pl/api/books/")
+      .then((response) => response.json())
+      .then((data) => {
+        const ongoing = data.slice(0, 20).map((book) => ({
+          id: book.slug || `${Math.random()}`,
+          poster: `https://wolnelektury.pl/media/${book.cover}`,
+          title: book.title,
+          subtitle: book.author,
+          genre: book.genre || "Unknown",
+          isFree: "Yes",
+        }));
+
+        const past = data.slice(20, 40).map((book) => ({
+          id: book.slug || `${Math.random()}`,
+          poster: `https://wolnelektury.pl/media/${book.cover}`,
+          title: book.title,
+          subtitle: book.author,
+          genre: book.genre || "Unknown",
+          isFree: "Yes",
+        }));
+
+        setOngoingLessons(ongoing);
+        setPastLessons(past);
+        setFilteredLessons(ongoing);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError("Failed to load data. Please try again.");
+        console.error("Error fetching books:", error);
+        setLoading(false);
+      });
+  }, []);
 
   const onSelectSwitch = (value) => {
-    setGamesTab(value);
+    setBooksTab(value);
+    const lessons = value === 1 ? ongoingLessons : pastLessons;
+    setFilteredLessons(
+      lessons.filter((item) =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
   };
+
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+    const lessons = booksTab === 1 ? ongoingLessons : pastLessons;
+    setFilteredLessons(
+      lessons.filter((item) =>
+        item.title.toLowerCase().includes(text.toLowerCase())
+      )
+    );
+  };
+
+  const renderItem = ({ item }) => (
+    <ListItem
+      photo={{ uri: item.poster }}
+      title={item.title}
+      subTitle={item.subtitle}
+      genre={item.genre}
+      isFree={item.isFree}
+      onPress={() =>
+        navigation.navigate("Details", {
+          title: item.title,
+          id: item.id,
+        })
+      }
+    />
+  );
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
+      <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.greetingText}>Hello John Doe</Text>
+          <Text style={styles.greetingText}>Hello, Zaki </Text>
           <TouchableOpacity onPress={() => navigation.openDrawer()}>
             <ImageBackground
               source={require("../assets/images/user-profile.jpg")}
@@ -51,26 +115,13 @@ export default function HomeScreen({ navigation }) {
             color="#C6C6C6"
             style={styles.searchIcon}
           />
-          <TextInput placeholder="Search" />
+          <TextInput
+            placeholder="Search by title"
+            style={styles.searchInput}
+            value={searchQuery}
+            onChangeText={handleSearch}
+          />
         </View>
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Upcoming Lessons</Text>
-          <TouchableOpacity onPress={() => {}}>
-            <Text style={styles.seeAllText}>See all</Text>
-          </TouchableOpacity>
-        </View>
-        {/* 
-        <Carousel
-          ref={(c) => {
-            this._carousel = c;
-          }}
-          data={sliderData}
-          renderItem={renderBanner}
-          sliderWidth={windowWidth - 40}
-          itemWidth={300}
-          loop={true}
-        /> */}
 
         <View style={styles.switchContainer}>
           <CustomSwitch
@@ -81,40 +132,28 @@ export default function HomeScreen({ navigation }) {
           />
         </View>
 
-        {gamesTab == 1 &&
-          ongoinglessons.map((item) => (
-            <ListItem
-              key={item.id}
-              photo={item.poster}
-              title={item.title}
-              subTitle={item.subtitle}
-              isFree={item.isFree}
-              onPress={() =>
-                navigation.navigate("GameDetails", {
-                  title: item.title,
-                  id: item.id,
-                })
-              }
+        <View style={{ paddingBottom: 20 }}>
+          {loading ? (
+            <ActivityIndicator
+              size="large"
+              color="#00A"
+              style={styles.loader}
             />
-          ))}
-        {gamesTab == 2 &&
-          pastlessons.map((item) => (
-            <ListItem
-              key={item.id}
-              photo={item.poster}
-              title={item.title}
-              subTitle={item.subtitle}
-              isFree={item.isFree}
-              price={item.price}
-              onPress={() =>
-                navigation.navigate("GameDetails", {
-                  title: item.title,
-                  id: item.id,
-                })
+          ) : error ? (
+            <Text style={styles.errorText}>{error}</Text>
+          ) : (
+            <FlatList
+              data={filteredLessons}
+              keyExtractor={(item) => item.id}
+              renderItem={renderItem}
+              ListEmptyComponent={
+                <Text style={styles.emptyText}>No data available</Text>
               }
+              contentContainerStyle={styles.listContainer}
             />
-          ))}
-      </ScrollView>
+          )}
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -124,7 +163,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  scrollView: {
+  content: {
     padding: 20,
   },
   header: {
@@ -145,6 +184,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     flexDirection: "row",
+    alignItems: "center",
     borderColor: "#C6C6C6",
     borderWidth: 1,
     borderRadius: 8,
@@ -154,19 +194,26 @@ const styles = StyleSheet.create({
   searchIcon: {
     marginRight: 5,
   },
-  sectionHeader: {
-    marginVertical: 15,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontFamily: "Roboto-Medium",
-  },
-  seeAllText: {
-    color: "#00A",
+  searchInput: {
+    flex: 1,
   },
   switchContainer: {
     marginVertical: 20,
+  },
+  loader: {
+    marginTop: 20,
+  },
+  listContainer: {
+    paddingBottom: 20,
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 20,
+  },
+  emptyText: {
+    textAlign: "center",
+    color: "#666",
+    marginTop: 20,
   },
 });

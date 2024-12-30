@@ -27,7 +27,7 @@ const CustomDrawer = (props) => {
             source={require("../assets/images/user-profile.jpg")}
             style={styles.profileImage}
           />
-          <Text style={styles.profileName}>John Doe</Text>
+          <Text style={styles.profileName}>Zaki</Text>
         </View>
         <View style={styles.drawerListContainer}>
           <DrawerItemList {...props} />

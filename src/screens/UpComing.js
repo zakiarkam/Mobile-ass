@@ -8,20 +8,20 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-const BooksScreen = () => {
+const UpComing = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch data from the API
   useEffect(() => {
-    fetch("https://wolnelektury.pl/api/audiobooks/")
+    fetch("https://wolnelektury.pl/api/daisy/")
       .then((response) => response.json())
       .then((data) => {
         setBooks(data);
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching audiobooks:", error);
+        console.error("Error fetching daisy books:", error);
         setLoading(false);
       });
   }, []);
@@ -42,7 +42,7 @@ const BooksScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Source Books</Text>
+      <Text style={styles.heading}>Upcoming Books</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
@@ -109,4 +109,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BooksScreen;
+export default UpComing;

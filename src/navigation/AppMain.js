@@ -1,34 +1,22 @@
-import React, { use, useContext } from "react";
-
+import React, { useContext, useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { AuthContext } from "./src/navigation/AuthProvider";
-import auth from "@react-native-firebase/auth";
-
+import { AuthContext } from "./AuthProvider";
 import AuthStack from "./AuthStack";
 import AppStack from "./AppStack";
 
 function AppMain() {
-  const [user, setUser] = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [initializing, setInitializing] = useState(true);
 
-  const onAuthStateChanged = (user) => {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  };
-
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);
+    setInitializing(user === undefined);
+  }, [user]);
 
-  if (initializing) return null;
+  if (initializing) return null; // Add a spinner if needed
 
   return (
     <NavigationContainer>
-      {/* <AppStack /> */}
-      {/* <AuthStack /> */}
-      {user ? <AppStack /> : <AuthStack />}
+      {user ? <AuthStack /> : <AppStack />}
     </NavigationContainer>
   );
 }

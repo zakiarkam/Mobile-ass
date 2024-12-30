@@ -1,19 +1,16 @@
 import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-
 import CustomDrawer from "../components/CustomDrawer";
-
-import Ionicons from "react-native-vector-icons/Ionicons";
-
+import TabNavigator from "./TabNavigator";
 import ProfileScreen from "../screens/ProfileScreen";
 import MessagesScreen from "../screens/MessagesScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 
-import TabNavigator from "./TabNavigator";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const Drawer = createDrawerNavigator();
 
-const AuthStack = () => {
+const AppStack = () => {
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawer {...props} />}
@@ -55,7 +52,6 @@ const AuthStack = () => {
           ),
         }}
       />
-
       <Drawer.Screen
         name="Settings"
         component={SettingsScreen}
@@ -69,4 +65,4 @@ const AuthStack = () => {
   );
 };
 
-export default AuthStack;
+export default AppStack;
