@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -12,32 +12,47 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import CustomButton from "../components/CustomButton";
 import InputField from "../components/InputField";
-import { AuthContext } from "../navigation/AuthProvider";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { FIREBASE_AUTH } from "../../FirebaseConfig";
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register } = useContext(AuthContext);
-
-  const handleRegister = () => {
+  const handleRegister = async () => {
     // if (!email || !password || !confirmPassword) {
-    //   Alert.alert("Error", "All fields are required.");
+    //   Alert.alert("Please fill all fields");
     //   return;
     // }
+
     // if (password !== confirmPassword) {
-    //   Alert.alert("Error", "Passwords do not match.");
+    //   Alert.alert("Passwords do not match");
     //   return;
     // }
-    register(email, password)
-      .then(() => {
-        Alert.alert("Success", "Account created successfully!");
-        navigation.navigate("Login");
-      })
-      .catch((error) => {
-        Alert.alert("Error", error.message);
-      });
+
+    setIsSubmitting(true);
+
+    try {
+      // Create user with email and password
+      const userCredential = await createUserWithEmailAndPassword(
+        FIREBASE_AUTH,
+        email.trim().toLowerCase(),
+        password
+      );
+      const user = userCredential.user;
+
+      // Set display name (optional)
+      await updateProfile(user, { displayName: email.split("@")[0] });
+
+      Alert.alert("Success", "Registration successful!");
+      navigation.navigate("Login"); // Navigate to login page
+    } catch (error) {
+      Alert.alert("Registration Error", error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -90,7 +105,11 @@ const RegisterScreen = ({ navigation }) => {
           onChangeText={setConfirmPassword}
         />
 
-        <CustomButton label="Register" onPress={handleRegister} />
+        <CustomButton
+          label="Register"
+          onPress={handleRegister}
+          isLoading={isSubmitting}
+        />
 
         <View style={styles.loginTextContainer}>
           <Text>Already registered?</Text>

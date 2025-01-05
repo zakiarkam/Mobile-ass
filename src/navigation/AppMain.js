@@ -1,24 +1,28 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { AuthContext } from "./AuthProvider";
+import { useGlobalContext } from "../context/GlobalProvider";
 import AuthStack from "./AuthStack";
 import AppStack from "./AppStack";
 
-function AppMain() {
-  const { user } = useContext(AuthContext);
+const AppMain = () => {
+  const { user, loading } = useGlobalContext();
   const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    setInitializing(user === undefined);
-  }, [user]);
+    if (!loading) {
+      setInitializing(false);
+    }
+  }, [loading]);
 
-  if (initializing) return null; // Add a spinner if needed
+  if (initializing) {
+    return null;
+  }
 
   return (
     <NavigationContainer>
       {user ? <AuthStack /> : <AppStack />}
     </NavigationContainer>
   );
-}
+};
 
 export default AppMain;

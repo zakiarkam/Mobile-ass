@@ -1,21 +1,18 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCKp6JqbB3SvStx9pRxMHyGVCvoigHo_Gw",
-  authDomain: "mobileapp-1656a.firebaseapp.com",
-  projectId: "mobileapp-1656a",
-  storageBucket: "mobileapp-1656a.appspot.com",
-  messagingSenderId: "803236159083",
-  appId: "1:803236159083:web:49f96f574b702532cb5b2e",
+  apiKey: "AIzaSyBwoSH5sfLKB0pdB9U2aXRaiNXwOyHTsfY",
+  authDomain: "e-tution-76d41.firebaseapp.com",
+  projectId: "e-tution-76d41",
+  storageBucket: "e-tution-76d41.firebasestorage.app",
+  messagingSenderId: "785269187157",
+  appId: "1:785269187157:web:1e244ac8ffda2638fcaadc",
 };
 
-// Initialize Firebase (only if not already initialized)
-const FIREBASE_APP = !getApps().length
-  ? initializeApp(firebaseConfig)
-  : getApp();
+const FIREBASE_APP = initializeApp(firebaseConfig);
 const FIREBASE_AUTH = getAuth(FIREBASE_APP);
 const FIREBASE_DB = getFirestore(FIREBASE_APP);
 

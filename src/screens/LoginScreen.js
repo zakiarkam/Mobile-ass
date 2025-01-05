@@ -1,60 +1,71 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import {
   SafeAreaView,
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  Alert,
+  ActivityIndicator,
 } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import CustomButton from "../components/CustomButton";
 import InputField from "../components/InputField";
-import { AuthContext } from "../../src/navigation/AuthProvider";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { FIREBASE_AUTH } from "../../FirebaseConfig"; // Import Firebase configuration
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useContext(AuthContext);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [alert, setAlert] = useState({
+    visible: false,
+    title: "",
+    message: "",
+  });
 
-  const handleLogin = () => {
-    // if (!email || !password) {
-    //   Alert.alert("Error", "Please enter both email and password.");
-    //   return;
-    // }
-
-    login(email, password)
-      .then(() => {
-        Alert.alert("Success", "You are logged in!");
-      })
-      .then(() => {
-        navigation.navigate("Register");
-      })
-      .catch((error) => {
-        Alert.alert("Error", error.message);
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setAlert({
+        visible: true,
+        title: "Error",
+        message: "Please fill in all fields.",
       });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        FIREBASE_AUTH,
+        email,
+        password
+      );
+      setAlert({
+        visible: true,
+        title: "Success",
+        message: "Login successful!",
+      });
+      navigation.replace("Home"); // Redirect to Home Screen
+    } catch (error) {
+      setAlert({
+        visible: true,
+        title: "Error",
+        message: "Invalid credentials. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.svgContainer}>
-          {/* Add SVG or image here if needed */}
-        </View>
-
         <Text style={styles.heading}>Login</Text>
 
         <InputField
           label="Email ID"
-          icon={
-            <MaterialIcons
-              name="alternate-email"
-              size={20}
-              color="#666"
-              style={styles.icon}
-            />
-          }
+          icon={<MaterialIcons name="alternate-email" size={20} color="#666" />}
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
@@ -62,24 +73,25 @@ const LoginScreen = ({ navigation }) => {
 
         <InputField
           label="Password"
-          icon={
-            <MaterialIcons
-              name="lock-outline"
-              size={20}
-              color="#666"
-              style={styles.icon}
-            />
-          }
+          icon={<MaterialIcons name="lock-outline" size={20} color="#666" />}
           inputType="password"
           value={password}
           onChangeText={setPassword}
           fieldButtonLabel="Forgot?"
           fieldButtonFunction={() =>
-            Alert.alert("Forgot Password", "Feature not implemented yet!")
+            setAlert({
+              visible: true,
+              title: "Feature Not Available",
+              message: "Forgot Password feature is not implemented yet.",
+            })
           }
         />
 
-        <CustomButton label="Login" onPress={handleLogin} />
+        <CustomButton
+          label={isSubmitting ? <ActivityIndicator color="#fff" /> : "Login"}
+          onPress={handleLogin}
+          disabled={isSubmitting}
+        />
 
         <Text style={styles.orText}>OR</Text>
 
@@ -114,17 +126,11 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 25,
   },
-  svgContainer: {
-    alignItems: "center",
-  },
   heading: {
     fontSize: 28,
     fontWeight: "500",
     color: "#333",
     marginBottom: 30,
-  },
-  icon: {
-    marginRight: 5,
   },
   orText: {
     textAlign: "center",

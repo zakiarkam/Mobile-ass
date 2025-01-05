@@ -1,40 +1,54 @@
-import React, { createContext, useState, useEffect } from "react";
-import { FIREBASE_AUTH } from "../../FirebaseConfig";
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-} from "firebase/auth";
+// import React, { createContext, useState, useEffect } from "react";
+// import { FIREBASE_AUTH } from "../../FirebaseConfig";
+// import {
+//   signInWithEmailAndPassword,
+//   createUserWithEmailAndPassword,
+//   onAuthStateChanged,
+// } from "firebase/auth";
 
-export const AuthContext = createContext();
+// export const AuthContext = createContext();
 
-export default function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+// export default function AuthProvider({ children }) {
+//   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (currentUser) => {
-      setUser(currentUser);
-    });
-    return unsubscribe; // Cleanup listener
-  }, []);
+//   const login = async (email, password) => {
+//     try {
+//       const response = await signInWithEmailAndPassword(
+//         FIREBASE_AUTH,
+//         email,
+//         password
+//       );
+//       setUser(response.user);
+//       return response;
+//     } catch (error) {
+//       throw error;
+//     }
+//   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        login: async (email, password) => {
-          return signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
-        },
-        register: async (email, password) => {
-          return createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
-        },
-        logout: async () => {
-          return signOut(FIREBASE_AUTH);
-        },
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-}
+//   const register = async (email, password) => {
+//     try {
+//       const response = await createUserWithEmailAndPassword(
+//         FIREBASE_AUTH,
+//         email,
+//         password
+//       );
+//       setUser(response.user);
+//       return response;
+//     } catch (error) {
+//       throw error;
+//     }
+//   };
+
+//   useEffect(() => {
+//     const subscriber = onAuthStateChanged(FIREBASE_AUTH, (currentUser) => {
+//       setUser(currentUser);
+//     });
+//     return subscriber;
+//   }, []);
+
+//   return (
+//     <AuthContext.Provider value={{ user, login, register }}>
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// }

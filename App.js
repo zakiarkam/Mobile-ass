@@ -1,15 +1,15 @@
 import React, { use, useContext } from "react";
-import AuthProvider from "./src/navigation/AuthProvider";
+import GlobalProvider from "./src/context/GlobalProvider";
 import AppMain from "./src/navigation/AppMain";
 import { CountProvider } from "./src/context/CountContext";
 
 function App() {
   return (
-    <AuthProvider>
+    <GlobalProvider>
       <CountProvider>
         <AppMain />
       </CountProvider>
-    </AuthProvider>
+    </GlobalProvider>
   );
 }
 
